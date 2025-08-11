@@ -1,6 +1,5 @@
-------------
-Admin Based User Stories
-------------
+
+## Admin User Stories
 
 **Title:**
 _As an admin, I want log into the portal with my own username and password, so that I can log in securely._
@@ -59,9 +58,8 @@ _As an admin, I want to run a stored procedure in the MySQL CLI to get the numbe
 - In the future we could look at automating this report
 - Add indexing in the data for performance
 
------------
-Patient User Stories
------------
+
+## Patient User Stories
 
 **Title:**
 _As a patient user, I want to view a list of doctors without logging in, so that I can explore available options before deciding to register._
@@ -132,10 +130,7 @@ _As a patient user, I want to view my upcoming appointments, so that I can prepa
 - Display buttons for cancelling or adding new appointments in the list.
 - Consider colour coding the most urgent appointments in red for visual clarity
 
-
------------
-Doctor User Stories
------------
+## Doctor User Stories
 
 **Title:**
 _As a doctor user, I want to log into the portal, so that I can manage my appointments._
