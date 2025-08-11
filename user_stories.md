@@ -1,20 +1,7 @@
-# User Story Template
-**Title:**
-_As a [user role], I want [feature/goal], so that [reason]._
-**Acceptance Criteria:**
-1. [Criteria 1]
-2. [Criteria 2]
-3. [Criteria 3]
-**Priority:** [High/Medium/Low]
-**Story Points:** [Estimated Effort in Points]
-**Notes:**
-- [Additional information or edge cases]
-
 ------------
 Admin Based User Stories
 ------------
 
-# User Story Template
 **Title:**
 _As an admin, I want log into the portal with my own username and password, so that I can log in securely._
 **Acceptance Criteria:**
@@ -27,7 +14,6 @@ _As an admin, I want log into the portal with my own username and password, so t
 **Notes:**
 - User may need to reset their password
 
-# User Story Template
 **Title:**
 _As an admin, I want to log out of the portal, so that the system remains protected and prevents unauthorized usage._
 **Acceptance Criteria:**
@@ -39,7 +25,6 @@ _As an admin, I want to log out of the portal, so that the system remains protec
 **Notes:**
 - Ensure that tokens are invalidated after logging out and no sessions remain saved
 
-# User Story Template
 **Title:**
 _As an admin, I want to add new doctors to the portal, so that they can access the system and manage patient appointments_
 **Acceptance Criteria:**
@@ -51,7 +36,6 @@ _As an admin, I want to add new doctors to the portal, so that they can access t
 **Notes:**
 - Ensure assigning a doctors timetable and schedule during the creation process
 
-# User Story Template
 **Title:**
 _As an admin, I want to delete a doctor’s profile from the portal, so that I can remove outdated or inactive accounts._
 **Acceptance Criteria:**
@@ -63,7 +47,6 @@ _As an admin, I want to delete a doctor’s profile from the portal, so that I c
 **Notes:**
 - Potentially restrict if doctor has active appointments
 
-# User Story Template
 **Title:**
 _As an admin, I want to run a stored procedure in the MySQL CLI to get the number of appointments per month, so that I can track system usage statistics._
 **Acceptance Criteria:**
@@ -80,7 +63,6 @@ _As an admin, I want to run a stored procedure in the MySQL CLI to get the numbe
 Patient User Stories
 -----------
 
-# User Story Template
 **Title:**
 _As a patient user, I want to view a list of doctors without logging in, so that I can explore available options before deciding to register._
 **Acceptance Criteria:**
@@ -93,8 +75,6 @@ _As a patient user, I want to view a list of doctors without logging in, so that
 - Consider adding filters by location or speciality
 - If doctors profiles are not active, ensure they are not shown publically.
 
-
-# User Story Template
 **Title:**
 _As a patient user, I want to sign up using my email and password, so that I can create an account to book appointments._
 **Acceptance Criteria:**
@@ -106,8 +86,6 @@ _As a patient user, I want to sign up using my email and password, so that I can
 **Notes:**
 - Passwords must be stored securely and encrypted
 
-
-# User Story Template
 **Title:**
 _As a patient user, I want to log into the portal, so that I can manage my bookings and access my account features._
 **Acceptance Criteria:**
@@ -119,7 +97,6 @@ _As a patient user, I want to log into the portal, so that I can manage my booki
 **Notes:**
 - Ensure failed attempts are logged and after 5, user is locked out by IP Address
 
-# User Story Template
 **Title:**
 _As a patient user, I want to log out of the portal, so that I can secure my account and prevent unauthorized access._
 **Acceptance Criteria:**
@@ -131,7 +108,6 @@ _As a patient user, I want to log out of the portal, so that I can secure my acc
 **Notes:**
 - Ensure server-side sessions are removed
 
-# User Story Template
 **Title:**
 _As a patient user, I want to book an hour-long appointment with a doctor, so that I can consult with them at a convenient time._
 **Acceptance Criteria:**
@@ -144,7 +120,6 @@ _As a patient user, I want to book an hour-long appointment with a doctor, so th
 **Notes:**
 - Consider using a confirmation message on the user's profile once booking confirmed.
 
-# User Story Template
 **Title:**
 _As a patient user, I want to view my upcoming appointments, so that I can prepare accordingly._
 **Acceptance Criteria:**
@@ -161,7 +136,7 @@ _As a patient user, I want to view my upcoming appointments, so that I can prepa
 -----------
 Doctor User Stories
 -----------
-# User Story Template
+
 **Title:**
 _As a doctor user, I want to log into the portal, so that I can manage my appointments._
 **Acceptance Criteria:**
@@ -173,8 +148,6 @@ _As a doctor user, I want to log into the portal, so that I can manage my appoin
 **Notes:**
 - Lock the account after 5 failed login attempts
 
-
-# User Story Template
 **Title:**
 _As a doctor user, I want to log out of the portal, so that I can protect my data and prevent unauthorized access._
 **Acceptance Criteria:**
@@ -186,7 +159,6 @@ _As a doctor user, I want to log out of the portal, so that I can protect my dat
 **Notes:**
 - Ensure that any server-side validation is cleared and sessions are cleared
 
-# User Story Template
 **Title:**
 _As a doctor user, I want to view my appointment calendar, so that I can stay organized and manage my schedule effectively._
 **Acceptance Criteria:**
@@ -199,7 +171,6 @@ _As a doctor user, I want to view my appointment calendar, so that I can stay or
 - Consider adding a colour and a key for the different appointment types and or urgency of the appointment
 - Include filters to be able to quickly navigate between appointment types and dates.
 
-# User Story Template
 **Title:**
 _As a doctor user, I want to mark my unavailability, so that patients can only book available slots._
 **Acceptance Criteria:**
@@ -213,7 +184,6 @@ _As a doctor user, I want to mark my unavailability, so that patients can only b
 - Provide an option to set work hours and lunch hours
 - Consider an option to remove unnavailablilty that has been already set
 
-# User Story Template
 **Title:**
 _As a doctor user, I want to update my profile with specialization and contact information, so that patients have up-to-date details._
 **Acceptance Criteria:**
@@ -226,7 +196,6 @@ _As a doctor user, I want to update my profile with specialization and contact i
 - May include profile photo upload functionality
 - Ensure correct validation for phone numbers and email addresses using RegEx or equivelent 
 
-# User Story Template
 **Title:**
 _As a doctor user, I want to view patient details for my upcoming appointments, so that I can be prepared in advance._
 **Acceptance Criteria:**
