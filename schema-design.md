@@ -74,30 +74,30 @@
   "_id": "ObjectId('98jasd98jnsg')",
   "patientId": 28009080,
   "prescribingDoctorId": 8927039
-  "appointmentId": 20250812-004, //date and appointment count
-  "medication": : {
+  "appointmentId": "20250812-004",
+  "medication": {
     {
         "name": "Ramipril",
         "dosage": "250mg",
         "doctorNotes": "Take 1 tablet daily.",
-        "repeat": 1 month,
+        "repeat": "1 month",
     },
     {
         "name": "Ibruprofen",
         "dosage": "250mg",
         "doctorNotes": "Take 1 tablet every 4 hours as required. No more than 4 in 24 hours.",
-        "repeat": n/a,
-    }
+        "repeat": "n/a",
+    },
   },
   "pharmacy": {
     "name": "Walgreens SF",
     "location": "Market Street",
     "postcode": "CF418PT"
-    "postalId": "9898hd7h3d" //For the post office use
+    "postalId": "9898hd7h3d" 
   },
   "home_delivery_required": 1,
-  "priority": 10, //Can be used to triage 
+  "priority": 10,
   "treatment_for": "High Blood Pressure, Leg Pain",
   "follow_up_appointment_required": "Yes",
-  "follow_up_appointment_timeframe": "6 Months"
+  "follow_up_appointment_timeframe": "6 Months",
 }
