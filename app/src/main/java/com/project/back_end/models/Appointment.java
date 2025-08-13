@@ -115,28 +115,37 @@ public class Appointment {
 // 10. Getters and Setters:
 //    - Standard getter and setter methods are provided for accessing and modifying the fields: id, doctor, patient, appointmentTime, status, etc.
 
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Doctor getDoctor(){
-        return this.doctor;
+        return doctor;
     }
     public void setDoctor(Doctor doctor){
         this.doctor = doctor;
     }
 
     public Patient getPatient(){
-        return this.patient;
+        return patient;
     }
     public void setPatient(Patient patient){
         this.patient = patient;
     }
     public LocalDateTime getAppointmentTime(){
-        return this.appointmentTime;
+        return appointmentTime;
     }
     public void setAppointmentTime(LocalDateTime appointmentTime){
         this.appointmentTime = appointmentTime;
     }
 
     public int getStatus(){
-        return this.status;
+        return status;
     }
     public void setStatus(int status){
         this.status = status;
