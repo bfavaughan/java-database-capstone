@@ -50,7 +50,8 @@ private String id;
 //      - The @NotNull annotation ensures that the dosage information is provided.
 
     @NotNull
-    private String doctorNotes;
+    @Size(min = 1, max = 200) // adding a basic size on for this so it isn't open ended
+    private String dosage;
 
 // 6. 'doctorNotes' field:
 //    - Type: private String
