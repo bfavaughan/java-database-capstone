@@ -1,4 +1,80 @@
 /* This is the style sheet for the doctorDashboard.html */
+/* Do not need to include global resets or html body or wrapper
+    because they are included in adminDashboard and are already
+    being pulled through to the page. Duplication of code.
+    */
+.table-header {
+    font-size:24px;
+    color:#015c5d;
+    margin-bottom:30px;
+    margin-right:0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top:20px;
+}
+thead {
+    background:#33333310;
+    color:#ffffff
+}
+td, th {
+    padding:12px 16px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+
+tr:nth-child(even) {
+  background-color: #f9f9f959; /* semi-transparent light grey */
+}
+
+tr:nth-child(odd) {
+  background-color: #ffffffc0; /* soft white */
+}
+
+tr:hover {
+  background-color: #015c5d39; /* light teal overlay */
+}
+
+.prescription-btn {
+    height: 30px;
+    width: 30px;
+    cursor:pointer;
+    transition: ease 0.6s;
+}
+
+.prescription-btn:hover {
+    transform:scale(1.1);
+    filter:brightness(1.3)
+}
+
+/*On click? */
+
+.prescription-btn:active{
+    transform:scale(0.95);
+}
+
+ .noPatientRecord {
+    font-size: 16px;
+    font-style: italic;
+    color:grey;
+ }
+ .today-btn {
+    margin-right:10px;
+    padding:10px;
+    background:#015c5d;
+ }
+ .date-picker {
+    margin-left:10px;
+    margin-top:13px;
+    border-radius: 8px;
+    padding:10px;
+    height:30px;
+ }
+
 /* 
 **Table Header (`.table-header`)**
 

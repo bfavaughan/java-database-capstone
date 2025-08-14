@@ -1,5 +1,60 @@
 /* this is the style sheet file for index.htlm  */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
+html, body {
+    font-family: 'Roboto', sans-serif;
+}   
+
+.wrapper {
+    display: flex;
+    flex-flow: column;
+}
+h2 {
+    font-size: 48px;
+    margin-bottom: 50px;
+    color: #003e3e;
+    font-family: 'Alegreya', 'Roboto', sans-serif;
+    font-weight: bold;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 40px;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+    display: flex;
+    text-align: center;
+    background:url("index.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+
+button {
+    background: #015c5d;
+    color:white;
+    border:0;
+    border-radius: 12px;
+    padding: 10px 20px;
+    width: 200px;
+    margin-top:10px;
+    cursor: pointer;
+    font-size:16px;
+
+ }
+ button:hover {
+    background: #A62B1F;
+ }
+ .dashboard-btn {
+    background:#015c5d;
+
+ }
+ .dashboard-btn:hover {
+    background: #003e3e;
+ }
 /* 
 **Global Reset (`*`)**
 
