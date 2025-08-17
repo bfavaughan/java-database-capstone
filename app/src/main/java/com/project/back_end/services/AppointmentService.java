@@ -1,6 +1,113 @@
 package com.project.back_end.services;
 
+
+import com.example.model.Appointment;
+import com.example.model.Doctor;
+import com.example.model.Patient;
+import com.example.repository.AppointmentRepository;
+import com.example.repository.DoctorRepository;
+import com.example.repository.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
+
+
+@Service
 public class AppointmentService {
+
+
+    private final AppointmentRepository appointmentRepository;
+    private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
+    private final TokenService tokenService;
+
+    //THOUGHT that we need a contstructor
+    @Autowired
+    public AppointmentService(AppointmentRepository appointmentRepository,
+                              PatientRepository patientRepository,
+                              DoctorRepository doctorRepository,
+                              TokenService tokenService) {
+        this.appointmentRepository = appointmentRepository;
+        this.patientRepository = patientRepository;
+        this.doctorRepository = doctorRepository;
+        this.tokenService = tokenService;
+    }
+
+     public int bookAppointment(Appointment appointment) {
+        try {
+            appointmentRepository.save(appointment);
+            return 1; // success
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0; // failure
+        }
+    }
+
+       public ResponseEntity<Map<String, String>> updateAppointment(Appointment appointment) {
+        Map<String, String> response = new HashMap<>();
+
+        Appointment existing = appointmentRepository.findById(appointment.getId()).orElse(null);
+        if (existing == null) {
+            response.put("message", "Appointment not found");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        //LOOK for doctors in doctor repositry
+        Doctor doctor = doctorRepository.findById(appointment.getDoctorId()).orElse(null);
+        if (doctor == null) {
+            response.put("message", "Invalid doctor ID");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        //Is appointment date already passed??
+        if (appointment.getAppointmentTime().isBefore(LocalDateTime.now())) {
+            response.put("message", "Appointment time cannot be in the past");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        //Grab existing appointments using the func we just wrote
+        List<Appointment> existingAppointments = appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(
+                appointment.getDoctorId(),
+                appointment.appointmentTimeOnly().minusMinutes(10),//10 mins before
+                appointment.appointmentTimeOnly().plusMinutes(60) //see if it's more than 60 minutes
+        );
+        //if we have any coming back then timeslot taken
+        if (!existingAppointments.isEmpty()) {
+            response.put("message", "Appointment already booked for this time slot");
+            return ResponseEntity.badRequest().body(response);
+        }// Check if appointment time is in the past
+if (appointment.getAppointmentTime().isBefore(LocalDateTime.now())) {
+    response.put("message", "Appointment time cannot be in the past");
+    return ResponseEntity.badRequest().body(response);
+}
+        
+
+
+
+      public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
+        Map<String, String> response = new HashMap<>();
+
+AppointAppointment .orElse == null     Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
+        if (appointmentOpt.isEmpty()) {
+            response.put("message", "Appointment not found");
+         
+   }
+
+        appointmentRepository.delete(appointment);
+        response.put("message", "Appointment cancelled successfully");
+        return ResponseEntity.ok(response);
+    }        appointmentRepository.save(appointment);
+        response.put("message", "Appointment updated successfully");
+        return ResponseEntity.ok(response);
+    }
+
+
+
 // 1. **Add @Service Annotation**:
 //    - To indicate that this class is a service layer class for handling business logic.
 //    - The `@Service` annotation should be added before the class declaration to mark it as a Spring service component.

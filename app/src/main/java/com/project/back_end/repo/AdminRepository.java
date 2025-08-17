@@ -1,6 +1,14 @@
 package com.project.back_end.repo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface AdminRepository {
+@Repository
+public interface AdminRepository extends JpaRepository {
+
+
+    public Admin findByUsername(String username);
 
     // 1. Extend JpaRepository:
 //    - The repository extends JpaRepository<Admin, Long>, which gives it basic CRUD functionality.
