@@ -48,7 +48,7 @@ public class AppointmentService {
         }
     }
 
-       public ResponseEntity<Map<String, String>> updateAppointment(Appointment appointment) {
+    public ResponseEntity<Map<String, String>> updateAppointment(Appointment appointment) {
         Map<String, String> response = new HashMap<>();
 
         Appointment existing = appointmentRepository.findById(appointment.getId()).orElse(null);
@@ -80,32 +80,62 @@ public class AppointmentService {
         if (!existingAppointments.isEmpty()) {
             response.put("message", "Appointment already booked for this time slot");
             return ResponseEntity.badRequest().body(response);
-        }// Check if appointment time is in the past
-if (appointment.getAppointmentTime().isBefore(LocalDateTime.now())) {
-    response.put("message", "Appointment time cannot be in the past");
-    return ResponseEntity.badRequest().body(response);
-}
-        
-
-
-
-      public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
-        Map<String, String> response = new HashMap<>();
-
-AppointAppointment .orElse == null     Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
-        if (appointmentOpt.isEmpty()) {
-            response.put("message", "Appointment not found");
-         
-   }
-
-        appointmentRepository.delete(appointment);
-        response.put("message", "Appointment cancelled successfully");
-        return ResponseEntity.ok(response);
-    }        appointmentRepository.save(appointment);
+        }
+        // Check if appointment time is in the past
+        if (appointment.getAppointmentTime().isBefore(LocalDateTime.now())) {
+            response.put("message", "Appointment time cannot be in the past");
+            return ResponseEntity.badRequest().body(response);
+        }
+        appointmentRepository.save(appointment);
         response.put("message", "Appointment updated successfully");
         return ResponseEntity.ok(response);
     }
 
+    public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
+        Map<String, String> response = new HashMap<>();
+
+        Appointment appointmentOpt = appointmentRepository.findById(id).orElse(null);
+        if (appointmentOpt == null) {
+            response.put("message", "Appointment not found");
+        }
+
+        appointmentRepository.delete(appointment);
+        response.put("message", "Appointment cancelled successfully");
+        return ResponseEntity.ok(response);
+    }
+    @Transactional
+    public Map<String, Object> getAppointments(String doctorId, String pname, LocalDate date, String token) {
+        Map<String, Object> response = new HashMap<>();
+        Long docId = Long.parseLong(doctorId);
+    
+        if (pname == null && date == null) {
+            response.put("message", "Either patient name or date must be provided");
+            return response;
+        }
+    
+        LocalDateTime start = (date != null) ? date.atStartOfDay() : null;
+        LocalDateTime end = (date != null) ? start.plusDays(1) : null;
+    
+        List<Appointment> appointments;
+    
+        if (pname != null && date != null) {
+            appointments = appointmentRepository
+                    .findByDoctorIdAndPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
+                            docId, pname, start, end);
+        } else if (date != null) {
+            appointments = appointmentRepository
+                    .findByDoctorIdAndAppointmentTimeBetween(docId, start, end);
+        } else {
+            // fallback in case only pname is provided without date
+            response.put("message", "Date must be provided if searching by patient name");
+            return response;
+        }
+    
+        response.put("appointments", appointments);
+        return response;
+    }
+    
+    //CHANGE STATUS METHOD NOT MENTIONED ON MAIN TUTORIAL SO IGNORING
 
 
 // 1. **Add @Service Annotation**:

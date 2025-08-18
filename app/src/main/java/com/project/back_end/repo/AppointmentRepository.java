@@ -51,13 +51,22 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> filterByDoctorNameAndPatientId(@Param("doctorName") String doctorName,
                                                      @Param("patientId") Long patientId);
 
-    @Query("SELECT a FROM Appointment a " +
-           "WHERE LOWER(a.doctorName) LIKE LOWER(CONCAT('%', :doctorName, '%')) " +
-           "AND a.patientId = :patientId " +
-           "AND a.status = :status")
-    List<Appointment> filterByDoctorNameAndPatientIdAndStatus(@Param("doctorName") String doctorName,
-                                                              @Param("patientId") Long patientId,
-                                                              @Param("status") int status);
+                                                     @Query("SELECT a FROM Appointment a " +
+                                                     "WHERE LOWER(a.doctorName) LIKE LOWER(CONCAT('%', :doctorName, '%')) " +
+                                                     "AND a.patientId = :patientId " +
+                                                     "AND a.status = :status")
+                                              List<Appointment> filterByDoctorNameAndPatientIdAndStatus(@Param("doctorName") String doctorName,
+                                                                                                        @Param("patientId") Long patientId,
+                                                                                                        @Param("status") int status);
+
+        @Query("SELECT a FROM Appointment a " +
+            "WHERE a.patient.id = :patientId " + 
+            "AND a.status = :status")
+            List<Appointment> filterByPatientIdAndStatus(
+                @Param("patientId") Long patientId,
+                @Param("status") int status);
+
+    List<Appointment> findByPatientIdAndDoctorName(Long patientId, String doctorName);
 
    // 1. Extend JpaRepository:
 //    - The repository extends JpaRepository<Appointment, Long>, which gives it basic CRUD functionality.

@@ -1,6 +1,224 @@
 package com.project.back_end.services;
 
+@Service
 public class DoctorService {
+
+    private final AppointmentRepository appointmentRepository;
+    private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
+    private final TokenService tokenService;
+
+    //THOUGHT that we need a contstructor same as doctor one!
+    @Autowired
+    public DoctorService(AppointmentRepository appointmentRepository,
+                              PatientRepository patientRepository,
+                              DoctorRepository doctorRepository,
+                              TokenService tokenService) {
+        this.appointmentRepository = appointmentRepository;
+        this.patientRepository = patientRepository;
+        this.doctorRepository = doctorRepository;
+        this.tokenService = tokenService;
+    }
+
+    @Transactional
+    public List<String> getDoctorAvailability(Long doctorId, LocalDate date) {
+        // 1. Define working hours
+        int startHour = 9;
+        int endHour = 17;
+
+        // 2. Generate list of all hours in the working day
+        List<Integer> hours = new ArrayList<>();
+        for (int h = startHour; h <= endHour; h++) {
+            hours.add(h);
+        }
+
+        // 3. Fetch all appointments for this doctor on that date
+        LocalDateTime startOfDay = date.atTime(startHour, 0);
+        LocalDateTime endOfDay = date.atTime(endHour, 0);
+        List<Appointment> appointments = appointmentRepository
+                .findByDoctorIdAndAppointmentTimeBetween(doctorId, startOfDay, endOfDay);
+
+        // 4. Remove booked hours from the list
+        for (Appointment a : appointments) {
+            int bookedHour = a.getAppointmentTime().getHour();
+            hours.remove(Integer.valueOf(bookedHour)); // remove the hour
+        }
+
+        // 5. Convert remaining hours into "HH:mm-HH:mm" strings
+        List<String> availableSlots = new ArrayList<>();
+        for (int h : hours) {
+            String slot = String.format("%02d:00-%02d:00", h, h + 1);
+            availableSlots.add(slot);
+        }
+
+        return availableSlots;
+    }
+
+    public int saveDoctor(Doctor doctor) {
+        try {
+            if (doctorRepository.findByEmail(doctor.getEmail()) != null) {
+                return -1; 
+            }
+    
+            doctorRepository.save(doctor);
+    
+            return 1; 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0; 
+        }
+    }
+    public int updateDoctor(Doctor doctor) {
+        try {
+            if (doctorRepository.findById(doctor.getId()).isEmpty()) {
+                return -1; 
+            }
+    
+            doctorRepository.save(doctor);
+    
+            return 1; 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0; 
+        }
+    }
+
+    public List<Doctor> getDoctors(){
+        return doctorRepository.findAll();
+    }
+
+    public int deleteDoctor(long id) {
+        try {
+            Optional<Doctor> doctorOpt = doctorRepository.findById(id);
+            if (doctorOpt.isEmpty()) {
+                return -1;
+            }
+            appointmentRepository.deleteAllByDoctorId(id);
+    
+            doctorRepository.deleteById(id);
+    
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    public ResponseEntity<Map<String, String>> validateDoctor(Login login) {
+        Map<String, String> response = new HashMap<>();
+    
+        try {
+            Doctor doctor = doctorRepository.findByEmail(login.getEmail());
+            if (doctor == null) {
+                response.put("message", "Doctor not found");
+                return ResponseEntity.status(404).body(response);
+            }
+    
+            if (!doctor.getPassword().equals(login.getPassword())) {
+                response.put("message", "Invalid password");
+                return ResponseEntity.status(401).body(response);
+            }
+            
+            String token = tokenService.generateToken(login.getEmail());
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("message", "Error with login");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    public Map<String, Object> findDoctorByName(String name) {
+        Map<String, Object> response = new HashMap<>();
+    
+        try {
+            List<Doctor> doctors = doctorRepository.findByNameLike("%" + name + "%");
+    
+            response.put("doctors", doctors);
+    
+            if (doctors.isEmpty()) {
+                response.put("message", "No doctors found");
+            }
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("message", "Internal error");
+        }
+    
+        return response;
+    }
+    private List<Doctor> filterDoctorByTime(List<Doctor> doctors, String amOrPm) {
+        if (amOrPm == null) return doctors; // no filtering
+    
+        boolean filterAM = amOrPm.equalsIgnoreCase("AM");
+        List<Doctor> filtered = new ArrayList<>();
+    
+        for (Doctor doctor : doctors) {
+            for (String slot : doctor.getAvailableTimes()) {
+                int hour = Integer.parseInt(slot.substring(0, 2)); // extract hour from "09:00-10:00" WHY are we storing them like this???
+                if ((filterAM && hour < 12) || (!filterAM && hour >= 12)) {
+                    filtered.add(doctor); // add doctor if any slot matches AM/PM
+                    break; 
+                }
+            }
+        }
+    
+        return filtered;
+    }
+
+    public Map<String,Object> filterDoctorsByNameSpecilityandTime(String name, String specialty, String amOrPm){
+        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
+        doctors = filterDoctorByTime(doctors, amOrPm);
+    
+        Map<String,Object> response = new HashMap<>();
+        response.put("doctors", doctors);
+        return response;
+    }
+    
+    public Map<String,Object> filterDoctorByNameAndTime(String name, String amOrPm){
+        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCase(name);
+        doctors = filterDoctorByTime(doctors, amOrPm);
+    
+        Map<String,Object> response = new HashMap<>();
+        response.put("doctors", doctors);
+        return response;
+    }
+    
+    public Map<String,Object> filterDoctorByNameAndSpecility(String name, String specialty){
+        List<Doctor> doctors = doctorRepository.findByNameContainingIgnoreCaseAndSpecialtyIgnoreCase(name, specialty);
+    
+        Map<String,Object> response = new HashMap<>();
+        response.put("doctors", doctors);
+        return response;
+    }
+
+    public Map<String,Object> filterDoctorByTimeAndSpecility(String specialty, String amOrPm){
+        List<Doctor> doctors = doctorRepository.findBySpecialtyIgnoreCase(specialty);
+        doctors = filterDoctorByTime(doctors, amOrPm);
+    
+        Map<String,Object> response = new HashMap<>();
+        response.put("doctors", doctors);
+        return response;
+    }
+    
+
+    public Map<String,Object> filterDoctorBySpecility(String specialty){
+        List<Doctor> doctors = doctorRepository.findBySpecialtyIgnoreCase(specialty);
+    
+        Map<String,Object> response = new HashMap<>();
+        response.put("doctors", doctors);
+        return response;
+    }
+    
+    public Map<String,Object> filterDoctorsByTime(String amOrPm){
+        List<Doctor> doctors = doctorRepository.findAll();
+        doctors = filterDoctorByTime(doctors, amOrPm);
+    
+        Map<String,Object> response = new HashMap<>();
+        response.put("doctors", doctors);
+        return response;
+    }
 
 // 1. **Add @Service Annotation**:
 //    - This class should be annotated with `@Service` to indicate that it is a service layer class.

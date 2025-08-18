@@ -1,6 +1,102 @@
 package com.project.back_end.services;
 
+import com.project.back_end.repositories.AdminRepository;
+import com.project.back_end.repositories.DoctorRepository;
+import com.project.back_end.repositories.PatientRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+
+@Component
 public class TokenService {
+
+    private final AdminRepository adminRepository;
+    private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    private SecretKey secretKey;
+
+    public TokenService(AdminRepository adminRepository,
+                        DoctorRepository doctorRepository,
+                        PatientRepository patientRepository) {
+        this.adminRepository = adminRepository;
+        this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
+    }
+
+    //Online things said it was better to sign it here on construct so it's available?
+    //makes sense
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    }
+
+    //gen
+    public String generateToken(String identifier) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + 7L * 24 * 60 * 60 * 1000); // 7 days
+
+        //Would have been great to have been shown this?? 
+        return Jwts.builder()
+                .setSubject(identifier)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    //This was what I saw online with regards to the parser?
+    //seems to do what we want it to
+    public String extractIdentifier(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
+            return null; // token invalid
+        }
+    }
+
+    // Grab the identifier from token then see if they exist
+    public boolean validateToken(String token, String userType) {
+        try {
+            //ADMIN doesn't use email so can't check against email
+            //THEREFORE we use grabbing the identifier from token instead
+            String identifier = extractIdentifier(token);
+            if (identifier == null) return false;
+
+            //CHECK if they exist????
+            switch (userType.toLowerCase()) {
+                case "admin":
+                    return adminRepository.existsByUsername(identifier);
+                case "doctor":
+                    return doctorRepository.existsByEmail(identifier);
+                case "patient":
+                    return patientRepository.existsByEmail(identifier);
+                default:
+                    return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Get the signing key -> Created on construct for simplicity
+    public SecretKey getSigningKey() {
+        return secretKey;
+    }
 // 1. **@Component Annotation**
 // The @Component annotation marks this class as a Spring component, meaning Spring will manage it as a bean within its application context.
 // This allows the class to be injected into other Spring-managed components (like services or controllers) where it's needed.
