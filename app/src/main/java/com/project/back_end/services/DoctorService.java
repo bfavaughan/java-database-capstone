@@ -1,4 +1,33 @@
 package com.project.back_end.services;
+import com.project.back_end.DTO.*;
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;        // for ArrayList
+import java.time.LocalDateTime;     // for LocalDateTime
+import java.util.Optional;          // for Optional
+import java.util.HashMap;           // for HashMap
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+// --- Spring Core ---
+import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.*;
+
+// --- Spring Web / REST ---
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+
+// --- Spring Transaction / JPA ---
+import org.springframework.transaction.annotation.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.*;
 
 @Service
 public class DoctorService {

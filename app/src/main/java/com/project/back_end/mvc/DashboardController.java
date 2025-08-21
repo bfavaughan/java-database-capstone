@@ -1,9 +1,20 @@
 package com.project.back_end.mvc;
+
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+import com.project.back_end.DTO.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class DashboardController {
@@ -32,16 +43,16 @@ public class DashboardController {
 //    - If the token is valid, forwards the user to the `"doctor/doctorDashboard"` view.
 //    - If the token is invalid, redirects to the root URL.
 
-private final SharedService sharedService;
+private final MainService service;
 
     @Autowired
-    public DashboardController(SharedService sharedService) {
-        this.sharedService = sharedService;
+    public DashboardController(MainService service) {
+        this.service = service;
     }
 
     @GetMapping("/adminDashboard/{token}")
     public ModelAndView adminDashboard(@PathVariable("token") String token) {
-        Map<String, Object> validationResult = sharedService.validateToken(token, "admin");
+        Map<String, Object> validationResult = service.validateToken(token, "admin");
 
         if (validationResult.isEmpty()) {
             return "admin/adminDashboard";
@@ -51,7 +62,7 @@ private final SharedService sharedService;
     }
     @GetMapping("/doctorDashboard/{token}")
     public String doctorDashboard(@PathVariable("token") String token) {
-        Map<String, Object> validationResult = sharedService.validateToken(token, "doctor");
+        Map<String, Object> validationResult = service.validateToken(token, "doctor");
 
         if (validationResult.isEmpty()) {
             return "doctor/doctorDashboard";

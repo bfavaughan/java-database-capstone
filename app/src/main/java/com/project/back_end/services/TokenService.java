@@ -1,14 +1,32 @@
 package com.project.back_end.services;
 
-import com.project.back_end.repositories.AdminRepository;
-import com.project.back_end.repositories.DoctorRepository;
-import com.project.back_end.repositories.PatientRepository;
+
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+import com.project.back_end.DTO.*;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+// --- Spring Core ---
+import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.*;
+
+// --- Spring Web / REST ---
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+
+// --- Spring Transaction / JPA ---
+import org.springframework.transaction.annotation.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.*;
+
 
 import javax.crypto.SecretKey;
 import java.util.Date;

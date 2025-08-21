@@ -1,16 +1,24 @@
 package com.project.back_end.services;
 
-package com.example.service;
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.DTO.*;
+// --- Spring Core ---
+import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.*;
 
-import com.example.dto.AppointmentDTO;
-import com.example.model.Appointment;
-import com.example.model.Patient;
-import com.example.repository.AppointmentRepository;
-import com.example.repository.PatientRepository;
-import com.example.service.TokenService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+// --- Spring Web / REST ---
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+
+// --- Spring Transaction / JPA ---
+import org.springframework.transaction.annotation.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.*;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -124,7 +132,7 @@ public class PatientService {
         }
     }
 
-    ublic ResponseEntity<Map<String, Object>> filterByDoctorAndCondition(Long patientId, String doctorName, String condition) {
+    public ResponseEntity<Map<String, Object>> filterByDoctorAndCondition(Long patientId, String doctorName, String condition) {
         Map<String, Object> response = new HashMap<>();
         try {
             int status;

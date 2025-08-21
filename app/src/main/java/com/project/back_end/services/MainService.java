@@ -1,16 +1,32 @@
 package com.project.back_end.services;
 
+import com.project.back_end.DTO.*;
 import com.project.back_end.models.*;
-import com.project.back_end.repositories.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+
+// --- Spring Core ---
+import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.*;
+
+// --- Spring Web / REST ---
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+
+// --- Spring Transaction / JPA ---
+import org.springframework.transaction.annotation.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.*;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class ServiceClass {
+public class MainService {
 
     private final TokenService tokenService;
     private final AdminRepository adminRepository;
@@ -20,7 +36,7 @@ public class ServiceClass {
     private final PatientService patientService;
 
     @Autowired
-    public ServiceClass(TokenService tokenService,
+    public MainService(TokenService tokenService,
                         AdminRepository adminRepository,
                         DoctorRepository doctorRepository,
                         PatientRepository patientRepository,
@@ -78,7 +94,7 @@ public class ServiceClass {
     public ResponseEntity<Map<String, Object>> filterDoctor(String name, String specialty, String time) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Doctor[] doctors = doctorService.filterDoctorsByNameSpecialtyAndTime(name, specialty, time);
+            Doctor[] doctors = doctorService.filterDoctorsByNameSpecilityandTime(name, specialty, time);
             response.put("doctors", doctors);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -91,12 +107,12 @@ public class ServiceClass {
     public int validateAppointment(Appointment appointment) {
         try {
             //is the doctor existing?
-            Doctor doctor = doctorRepository.findById(appointment.getDoctorId());
+            Doctor doctor = doctorRepository.findById(appointment.getId());
             if (doctor == null) return -1;
             //GRAB all slots
-            String[] slots = doctorService.getDoctorAvailability(doctor.getId(), appointment.getDate());
+            String[] slots = doctorService.getDoctorAvailability(doctor.getId(), appointment.getAppointmentTime());
             for (int i = 0; i < slots.length; i++) {
-                if (slots[i].equals(appointment.getTime())) {
+                if (slots[i].equals(appointment.getAppointmentTime())) {
                     return 1;
                 }
             }

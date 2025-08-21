@@ -1,6 +1,13 @@
 package com.project.back_end.repo;
 
-import com.example.model.Doctor;
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+import com.project.back_end.DTO.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

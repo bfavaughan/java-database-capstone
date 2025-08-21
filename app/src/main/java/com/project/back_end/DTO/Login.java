@@ -1,12 +1,15 @@
 package com.project.back_end.DTO;
 
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+
 public class Login {
     private String email;
     private String password;
 
     // Default constructor needed??
-    public LoginDTO() {
-    }
+    public Login() {}
 
     public String getEmail() {return email;}
     public String getPassword() {return password;}

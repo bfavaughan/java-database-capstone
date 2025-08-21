@@ -1,15 +1,26 @@
 package com.project.back_end.services;
 
 
-import com.example.model.Appointment;
-import com.example.model.Doctor;
-import com.example.model.Patient;
-import com.example.repository.AppointmentRepository;
-import com.example.repository.DoctorRepository;
-import com.example.repository.PatientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+import com.project.back_end.DTO.*;
+// --- Spring Core ---
+import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.*;
+
+// --- Spring Web / REST ---
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+
+// --- Spring Transaction / JPA ---
+import org.springframework.transaction.annotation.*;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.*;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

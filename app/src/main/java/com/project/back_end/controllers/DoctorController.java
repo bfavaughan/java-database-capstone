@@ -1,7 +1,107 @@
 package com.project.back_end.controllers;
 
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+import com.project.back_end.DTO.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("${api.path}doctor")
 public class DoctorController {
+
+    private final DoctorService doctorService;
+    private final MainService service;
+
+    @Autowired
+    public DoctorController(DoctorService doctorService, MainService service) {
+        this.doctorService = doctorService;
+        this.service = service;
+    }
+
+
+    @GetMapping("/availability/{user}/{doctorId}/{date}/{token}")
+    public ResponseEntity<Map<String, Object>> getDoctorAvailability(
+            @PathVariable String user,
+            @PathVariable Long doctorId,
+            @PathVariable LocalDate date,
+            @PathVariable String token) {
+
+        Map<String, Object> response = new HashMap<>();
+        try {
+            boolean valid = service.validateToken(token, user);
+            if (!valid) {
+                response.put("message", "Invalid or expired token");
+                return ResponseEntity.status(403).body(response);
+            }
+            return doctorService.getDoctorAvailability(doctorId, date);
+        } catch (Exception e) {
+            response.put("message", "Error retrieving availability");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getDoctor() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Doctor> doctors = doctorService.getAllDoctors();
+            response.put("doctors", doctors);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "Error fetching doctors");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @PostMapping("/{token}")
+    public ResponseEntity<Map<String, String>> saveDoctor(
+            @RequestBody Doctor doctor,
+            @PathVariable String token) {
+
+        return doctorService.saveDoctor(doctor, token);
+    }
+
+    // 6. Doctor login
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> doctorLogin(@RequestBody Login login) {
+        return doctorService.doctorLogin(login);
+    }
+
+    // 7. Update doctor (admin only)
+    @PutMapping("/{token}")
+    public ResponseEntity<Map<String, String>> updateDoctor(
+            @RequestBody Doctor doctor,
+            @PathVariable String token) {
+
+        return doctorService.updateDoctor(doctor, token);
+    }
+
+    // 8. Delete doctor (admin only)
+    @DeleteMapping("/{doctorId}/{token}")
+    public ResponseEntity<Map<String, String>> deleteDoctor(
+            @PathVariable Long doctorId,
+            @PathVariable String token) {
+
+        return doctorService.deleteDoctor(doctorId, token);
+    }
+
+    // 9. Filter doctors
+    @GetMapping("/filter/{name}/{time}/{speciality}")
+    public ResponseEntity<Map<String, Object>> filter(
+            @PathVariable String name,
+            @PathVariable String time,
+            @PathVariable String speciality) {
+
+        return service.filterDoctors(name, time, speciality);
+    }
 
 // 1. Set Up the Controller Class:
 //    - Annotate the class with `@RestController` to define it as a REST controller that serves JSON responses.

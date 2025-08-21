@@ -1,6 +1,77 @@
 package com.project.back_end.controllers;
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
+import com.project.back_end.services.*;
+import com.project.back_end.DTO.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/patient")
 public class PatientController {
+
+    private final PatientService patientService;
+    private final MainService service;
+
+    @Autowired
+    public PatientController(PatientService patientService, MainService service) {
+        this.patientService = patientService;
+        this.service = service;
+    }
+
+    // 3. Get patient details
+    @GetMapping("/{token}")
+    public ResponseEntity<Map<String, Object>> getPatient(@PathVariable String token) {
+        return patientService.getPatientDetails(token);
+    }
+
+    // 4. Create new patient
+    @PostMapping
+    public ResponseEntity<Map<String, String>> createPatient(@RequestBody Patient patient) {
+        return patientService.createPatient(patient);
+    }
+
+    // 5. Patient login
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> login(@RequestBody Login login) {
+        return service.validatePatientLogin(login);
+    }
+
+    // 6. Get patient appointments
+    @GetMapping("/appointments/{patientId}/{token}/{user}")
+    public ResponseEntity<Map<String, Object>> getPatientAppointment(
+            @PathVariable Long patientId,
+            @PathVariable String token,
+            @PathVariable String user) {
+
+        boolean valid = service.validateToken(token, user);
+        if (!valid) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("message", "Invalid or expired token"));
+        }
+
+        return patientService.getPatientAppointment(patientId, token);
+    }
+
+    // 7. Filter patient appointments
+    @GetMapping("/appointments/filter/{condition}/{name}/{token}")
+    public ResponseEntity<Map<String, Object>> filterPatientAppointment(
+            @PathVariable String condition,
+            @PathVariable String name,
+            @PathVariable String token) {
+
+        boolean valid = service.validateToken(token, "patient");
+        if (!valid) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("message", "Invalid or expired token"));
+        }
+
+        return patientService.filterPatient(condition, name, token);
+    }
 
 // 1. Set Up the Controller Class:
 //    - Annotate the class with `@RestController` to define it as a REST API controller for patient-related operations.

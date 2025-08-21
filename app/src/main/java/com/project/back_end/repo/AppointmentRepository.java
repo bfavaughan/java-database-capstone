@@ -1,5 +1,6 @@
 package com.project.back_end.repo;
-
+import com.project.back_end.models.*;
+import com.project.back_end.repo.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
