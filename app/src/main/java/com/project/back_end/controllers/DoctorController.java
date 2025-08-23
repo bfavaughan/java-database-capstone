@@ -1,9 +1,9 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-import com.project.back_end.DTO.*;
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Doctor;
+import com.project.back_end.services.DoctorService;
+import com.project.back_end.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,12 +36,13 @@ public class DoctorController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean valid = service.validateToken(token, user);
-            if (!valid) {
+            ResponseEntity<Map<String, String>> valid = service.validateToken(token, user);
+            if (!valid.getStatusCode().is2xxSuccessful()) {
                 response.put("message", "Invalid or expired token");
                 return ResponseEntity.status(403).body(response);
             }
-            return doctorService.getDoctorAvailability(doctorId, date);
+            response.put("success",doctorService.getDoctorAvailability(doctorId, date));
+            return ResponseEntity.ok(response) ;
         } catch (Exception e) {
             response.put("message", "Error retrieving availability");
             return ResponseEntity.status(500).body(response);
@@ -52,7 +53,7 @@ public class DoctorController {
     public ResponseEntity<Map<String, Object>> getDoctor() {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<Doctor> doctors = doctorService.getAllDoctors();
+            List<Doctor> doctors = doctorService.getDoctors();
             response.put("doctors", doctors);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -62,17 +63,19 @@ public class DoctorController {
     }
 
     @PostMapping("/{token}")
-    public ResponseEntity<Map<String, String>> saveDoctor(
+    public ResponseEntity<Map<String, Object>> saveDoctor(
             @RequestBody Doctor doctor,
             @PathVariable String token) {
-
-        return doctorService.saveDoctor(doctor, token);
+        Map<String, Object> response = new HashMap<>();
+        int saveDoc = doctorService.saveDoctor(doctor);
+        response.put("success","done");
+        return ResponseEntity.ok(response);
     }
 
     // 6. Doctor login
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> doctorLogin(@RequestBody Login login) {
-        return doctorService.doctorLogin(login);
+    public ResponseEntity<Map<String, String>> doctorLogin(@RequestBody Login login) {
+        return doctorService.validateDoctor(login);
     }
 
     // 7. Update doctor (admin only)
@@ -80,8 +83,14 @@ public class DoctorController {
     public ResponseEntity<Map<String, String>> updateDoctor(
             @RequestBody Doctor doctor,
             @PathVariable String token) {
-
-        return doctorService.updateDoctor(doctor, token);
+        Map<String, String> response = new HashMap<>();
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, "doctor");
+        if (!valid.getStatusCode().is2xxSuccessful()) {
+            response.put("message", "Invalid or expired token");
+            return ResponseEntity.status(403).body(response);
+        }
+        response.put("success", String.valueOf(doctorService.updateDoctor(doctor)));
+        return ResponseEntity.ok(response) ;
     }
 
     // 8. Delete doctor (admin only)
@@ -89,8 +98,14 @@ public class DoctorController {
     public ResponseEntity<Map<String, String>> deleteDoctor(
             @PathVariable Long doctorId,
             @PathVariable String token) {
-
-        return doctorService.deleteDoctor(doctorId, token);
+        Map<String, String> response = new HashMap<>();
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, "doctor");
+        if (!valid.getStatusCode().is2xxSuccessful()) {
+            response.put("message", "Invalid or expired token");
+            return ResponseEntity.status(403).body(response);
+        }
+        response.put("success", String.valueOf(doctorService.deleteDoctor(doctorId)));
+        return ResponseEntity.ok(response) ;
     }
 
     // 9. Filter doctors
@@ -99,8 +114,7 @@ public class DoctorController {
             @PathVariable String name,
             @PathVariable String time,
             @PathVariable String speciality) {
-
-        return service.filterDoctors(name, time, speciality);
+        return service.filterDoctor(name, time, speciality);
     }
 
 // 1. Set Up the Controller Class:

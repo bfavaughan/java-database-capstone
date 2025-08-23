@@ -1,29 +1,21 @@
 package com.project.back_end.services;
 
-import com.project.back_end.DTO.*;
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-
-// --- Spring Core ---
-import org.springframework.stereotype.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.*;
-
-// --- Spring Web / REST ---
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.*;
-
-// --- Spring Transaction / JPA ---
-import org.springframework.transaction.annotation.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.*;
-
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Admin;
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Doctor;
+import com.project.back_end.models.Patient;
+import com.project.back_end.repo.AdminRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class MainService {
@@ -94,7 +86,7 @@ public class MainService {
     public ResponseEntity<Map<String, Object>> filterDoctor(String name, String specialty, String time) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Doctor[] doctors = doctorService.filterDoctorsByNameSpecilityandTime(name, specialty, time);
+            Map<String, Object> doctors = doctorService.filterDoctorsByNameSpecilityandTime(name, specialty, time);
             response.put("doctors", doctors);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -107,12 +99,13 @@ public class MainService {
     public int validateAppointment(Appointment appointment) {
         try {
             //is the doctor existing?
-            Doctor doctor = doctorRepository.findById(appointment.getId());
-            if (doctor == null) return -1;
+            Optional<Doctor> optDoctor = doctorRepository.findById(appointment.getId());
+            if (optDoctor.isEmpty()) return -1;
             //GRAB all slots
-            String[] slots = doctorService.getDoctorAvailability(doctor.getId(), appointment.getAppointmentTime());
-            for (int i = 0; i < slots.length; i++) {
-                if (slots[i].equals(appointment.getAppointmentTime())) {
+            Doctor doctor = optDoctor.get();
+            List<String> slots = doctorService.getDoctorAvailability(doctor.getId(), appointment.getAppointmentTime().toLocalDate());
+            for (String slot : slots) {
+                if (slot.equals(appointment.getAppointmentTime().toString())) { // make sure types match
                     return 1;
                 }
             }
@@ -161,16 +154,21 @@ public class MainService {
         Map<String, Object> response = new HashMap<>();
         try {
             String email = tokenService.extractEmail(token);
-            AppointmentDTO[] appointments;
+            Long patientId = patientService.getPatientIdByEmail(email);
+            if (patientId == null) {
+                response.put("error", "Patient not found");
+                return ResponseEntity.status(404).body(response);
+            }
+            ResponseEntity<Map<String, Object>> appointments;
 
             if (condition != null && name != null) {
-                appointments = patientService.filterByDoctorAndCondition(email, name, condition);
+                appointments = patientService.filterByDoctorAndCondition(patientId, name, condition);
             } else if (condition != null) {
-                appointments = patientService.filterByCondition(email, condition);
+                appointments = patientService.filterByCondition(patientId, condition);
             } else if (name != null) {
-                appointments = patientService.filterByDoctor(email, name);
+                appointments = patientService.filterByDoctor(patientId, name);
             } else {
-                appointments = patientService.getPatientAppointments(email);
+                appointments = patientService.getPatientAppointments(patientId); //HAD TO MAKE THIS!!
             }
 
             response.put("appointments", appointments);

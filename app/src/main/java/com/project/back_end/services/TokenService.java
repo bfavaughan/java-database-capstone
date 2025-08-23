@@ -1,32 +1,15 @@
 package com.project.back_end.services;
 
 
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-import com.project.back_end.DTO.*;
-
-import io.jsonwebtoken.Claims;
+import com.project.back_end.repo.AdminRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-// --- Spring Core ---
-import org.springframework.stereotype.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.*;
-
-// --- Spring Web / REST ---
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.*;
-
-// --- Spring Transaction / JPA ---
-import org.springframework.transaction.annotation.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.*;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -74,10 +57,10 @@ public class TokenService {
 
     //This was what I saw online with regards to the parser?
     //seems to do what we want it to
-    public String extractIdentifier(String token) {
+    public String extractEmail(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
@@ -92,13 +75,14 @@ public class TokenService {
         try {
             //ADMIN doesn't use email so can't check against email
             //THEREFORE we use grabbing the identifier from token instead
-            String identifier = extractIdentifier(token);
+            String identifier = extractEmail(token);
             if (identifier == null) return false;
 
             //CHECK if they exist????
             switch (userType.toLowerCase()) {
                 case "admin":
                     return adminRepository.existsByUsername(identifier);
+
                 case "doctor":
                     return doctorRepository.existsByEmail(identifier);
                 case "patient":

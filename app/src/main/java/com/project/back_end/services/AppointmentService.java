@@ -1,31 +1,22 @@
 package com.project.back_end.services;
 
 
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-import com.project.back_end.DTO.*;
-// --- Spring Core ---
-import org.springframework.stereotype.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.*;
-
-// --- Spring Web / REST ---
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.*;
-
-// --- Spring Transaction / JPA ---
-import org.springframework.transaction.annotation.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.*;
-
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Doctor;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 @Service
@@ -84,8 +75,8 @@ public class AppointmentService {
         //Grab existing appointments using the func we just wrote
         List<Appointment> existingAppointments = appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(
                 appointment.getDoctorId(),
-                appointment.appointmentTimeOnly().minusMinutes(10),//10 mins before
-                appointment.appointmentTimeOnly().plusMinutes(60) //see if it's more than 60 minutes
+                appointment.getAppointmentTime().minusMinutes(10),//10 mins before
+                appointment.getAppointmentTime().plusMinutes(60) //see if it's more than 60 minutes
         );
         //if we have any coming back then timeslot taken
         if (!existingAppointments.isEmpty()) {
@@ -105,20 +96,19 @@ public class AppointmentService {
     public ResponseEntity<Map<String, String>> cancelAppointment(long id, String token) {
         Map<String, String> response = new HashMap<>();
 
-        Appointment appointmentOpt = appointmentRepository.findById(id).orElse(null);
-        if (appointmentOpt == null) {
+        Appointment appointment = appointmentRepository.findById(id).orElse(null);
+        if (appointment == null) {
             response.put("message", "Appointment not found");
         }
+
 
         appointmentRepository.delete(appointment);
         response.put("message", "Appointment cancelled successfully");
         return ResponseEntity.ok(response);
     }
     @Transactional
-    public Map<String, Object> getAppointments(String doctorId, String pname, LocalDate date, String token) {
+    public Map<String, Object> getAppointments(LocalDate date, String pname) {
         Map<String, Object> response = new HashMap<>();
-        Long docId = Long.parseLong(doctorId);
-    
         if (pname == null && date == null) {
             response.put("message", "Either patient name or date must be provided");
             return response;
@@ -131,11 +121,11 @@ public class AppointmentService {
     
         if (pname != null && date != null) {
             appointments = appointmentRepository
-                    .findByDoctorIdAndPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
-                            docId, pname, start, end);
+                    .findByPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
+                             pname, start, end);
         } else if (date != null) {
             appointments = appointmentRepository
-                    .findByDoctorIdAndAppointmentTimeBetween(docId, start, end);
+                    .findByAppointmentTimeBetween(start, end);
         } else {
             // fallback in case only pname is provided without date
             response.put("message", "Date must be provided if searching by patient name");
@@ -145,8 +135,25 @@ public class AppointmentService {
         response.put("appointments", appointments);
         return response;
     }
-    
-    //CHANGE STATUS METHOD NOT MENTIONED ON MAIN TUTORIAL SO IGNORING
+
+    // 8. Change Status Method
+    @Transactional
+    public boolean changeAppointmentStatus(Long appointmentId, int newStatus) {
+        // Find the appointment by ID
+        Optional<Appointment> optionalAppointment = appointmentRepository.findById(appointmentId);
+        if (optionalAppointment.isEmpty()) {
+            return false; // Appointment not found
+        }
+
+        Appointment appointment = optionalAppointment.get();
+        // Update the status
+        appointment.setStatus(newStatus);
+
+        // Save changes (optional if using JPA, transactional commit will persist)
+        appointmentRepository.save(appointment);
+
+        return true; // Status updated successfully
+    }
 
 
 // 1. **Add @Service Annotation**:

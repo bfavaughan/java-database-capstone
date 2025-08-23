@@ -1,7 +1,9 @@
 package com.project.back_end.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -68,6 +70,7 @@ public class Appointment {
 
     @NotNull(message = "Please provide a status of 0 for Schedulled or 1 for Completed")
     private int status;
+    private Long doctorId;
 
     // 6. 'getEndTime' method:
 //    - Type: private LocalDateTime
@@ -157,6 +160,14 @@ public class Appointment {
     /* Just adding this in for convenience and legibility */
     public void completeAppointment(){
         this.status = 1;
+    }
+
+    public Long getDoctorId() {
+        return this.doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
     }
 
 }

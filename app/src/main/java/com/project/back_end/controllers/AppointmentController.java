@@ -1,7 +1,8 @@
 package com.project.back_end.controllers;
 
 import com.project.back_end.models.Appointment;
-import com.project.back_end.services.*;
+import com.project.back_end.services.AppointmentService;
+import com.project.back_end.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +30,11 @@ public class AppointmentController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean valid = service.validateToken(token, "doctor");
-            if (valid) {
+            ResponseEntity<Map<String, String>> valid = service.validateToken(token, "doctor");
+            if (valid.getStatusCode().is2xxSuccessful()) {
                 LocalDate date = LocalDate.parse(dateStr); // convert string to LocalDate
-                return appointmentService.getAppointments(patientName, date);
+                response.put("success",appointmentService.getAppointments(date,patientName));
+                return ResponseEntity.ok(response);
             } else {
                 response.put("message", "Invalid or expired token");
                 return ResponseEntity.status(401).body(response);
@@ -51,9 +53,10 @@ public class AppointmentController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean valid = service.validateToken(token, "patient");
-            if (valid) {
-                return appointmentService.bookAppointment(appointment);
+            ResponseEntity<Map<String, String>> valid = service.validateToken(token, "patient");
+            if (valid.hasBody()) {
+                response.put("success",appointmentService.bookAppointment(appointment));
+                return ResponseEntity.ok(response);
             } else {
                 response.put("message", "Invalid or expired token");
                 return ResponseEntity.status(401).body(response);
@@ -72,9 +75,10 @@ public class AppointmentController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean valid = service.validateToken(token, "patient");
+            boolean valid = service.validateToken(token, "patient").hasBody();
             if (valid) {
-                return appointmentService.updateAppointment(appointment);
+                response.put("success",appointmentService.updateAppointment(appointment));
+                return ResponseEntity.ok(response);
             } else {
                 response.put("message", "Invalid or expired token");
                 return ResponseEntity.status(401).body(response);
@@ -93,9 +97,10 @@ public class AppointmentController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean valid = service.validateToken(token, "patient");
+            boolean valid = service.validateToken(token, "patient").hasBody();
             if (valid) {
-                return appointmentService.cancelAppointment(appointmentId);
+                response.put("success",appointmentService.cancelAppointment(appointmentId,token));
+                return ResponseEntity.ok(response);
             } else {
                 response.put("message", "Invalid or expired token");
                 return ResponseEntity.status(401).body(response);

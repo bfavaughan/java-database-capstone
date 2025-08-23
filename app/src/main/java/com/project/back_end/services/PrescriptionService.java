@@ -1,22 +1,14 @@
 package com.project.back_end.services;
 import com.project.back_end.models.*;
 import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-// --- Spring Core ---
+/* --- Spring Core --- */
 import org.springframework.stereotype.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.*;
 
 // --- Spring Web / REST ---
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 
 // --- Spring Transaction / JPA ---
-import org.springframework.transaction.annotation.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.*;
 
 
 import java.util.HashMap;
@@ -48,10 +40,10 @@ public class PrescriptionService {
     }
 
     // 2. Get Prescription by appointmentId
-    public ResponseEntity<Map<String, Object>> getPrescription(String appointmentId) {
+    public ResponseEntity<Map<String, Object>> getPrescription(Long appointmentId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Prescription prescription = prescriptionRepository.findByAppointmentId(appointmentId);
+            Prescription prescription = (Prescription) prescriptionRepository.findByAppointmentId(appointmentId);
             if (prescription != null) {
                 response.put("prescription", prescription);
                 return ResponseEntity.ok(response);

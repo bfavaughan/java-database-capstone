@@ -1,19 +1,12 @@
 package com.project.back_end.mvc;
 
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-import com.project.back_end.DTO.*;
-
+import com.project.back_end.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -51,10 +44,10 @@ private final MainService service;
     }
 
     @GetMapping("/adminDashboard/{token}")
-    public ModelAndView adminDashboard(@PathVariable("token") String token) {
-        Map<String, Object> validationResult = service.validateToken(token, "admin");
+    public String adminDashboard(@PathVariable("token") String token) {
 
-        if (validationResult.isEmpty()) {
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, "admin");
+        if (!valid.getStatusCode().is2xxSuccessful()) {
             return "admin/adminDashboard";
         } else {
             return "redirect:/login";
@@ -62,9 +55,8 @@ private final MainService service;
     }
     @GetMapping("/doctorDashboard/{token}")
     public String doctorDashboard(@PathVariable("token") String token) {
-        Map<String, Object> validationResult = service.validateToken(token, "doctor");
-
-        if (validationResult.isEmpty()) {
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, "doctor");
+        if (!valid.getStatusCode().is2xxSuccessful()) {
             return "doctor/doctorDashboard";
         } else {
             // Token invalid → redirect to login page

@@ -1,13 +1,14 @@
 package com.project.back_end.controllers;
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-import com.project.back_end.DTO.*;
 
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Patient;
+import com.project.back_end.services.MainService;
+import com.project.back_end.services.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -29,10 +30,13 @@ public class PatientController {
         return patientService.getPatientDetails(token);
     }
 
+
     // 4. Create new patient
     @PostMapping
-    public ResponseEntity<Map<String, String>> createPatient(@RequestBody Patient patient) {
-        return patientService.createPatient(patient);
+    public ResponseEntity<Map<String, Object>> createPatient(@RequestBody Patient patient) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success",String.valueOf(patientService.createPatient(patient)));
+        return ResponseEntity.ok(response);
     }
 
     // 5. Patient login
@@ -48,8 +52,8 @@ public class PatientController {
             @PathVariable String token,
             @PathVariable String user) {
 
-        boolean valid = service.validateToken(token, user);
-        if (!valid) {
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, user);
+        if (!valid.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(403)
                     .body(Map.of("message", "Invalid or expired token"));
         }
@@ -63,14 +67,13 @@ public class PatientController {
             @PathVariable String condition,
             @PathVariable String name,
             @PathVariable String token) {
-
-        boolean valid = service.validateToken(token, "patient");
-        if (!valid) {
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, "patient");
+        if (!valid.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(403)
                     .body(Map.of("message", "Invalid or expired token"));
         }
 
-        return patientService.filterPatient(condition, name, token);
+        return service.filterPatient(condition, name, token);
     }
 
 // 1. Set Up the Controller Class:

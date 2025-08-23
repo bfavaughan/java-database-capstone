@@ -1,4 +1,6 @@
 package com.project.back_end.DTO;
+import com.project.back_end.models.Appointment;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -43,7 +45,11 @@ public class AppointmentDTO {
             this.endTime = appointmentTime.plusHours(1);
         }
     }
-     public Long getId() { return id; }
+
+    public AppointmentDTO(Appointment appointment) {
+    }
+
+    public Long getId() { return id; }
      public Long getDoctorId() { return doctorId; }
      public String getDoctorName() { return doctorName; }
      public Long getPatientId() { return patientId; }

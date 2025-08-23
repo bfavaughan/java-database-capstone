@@ -1,6 +1,6 @@
 package com.project.back_end.repo;
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
+
+import com.project.back_end.models.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +37,28 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("end") LocalDateTime end
     );
 
+    // 1. Find appointments by patient name and time range (no doctor filter)
+    @Query("SELECT a FROM Appointment a " +
+            "LEFT JOIN FETCH a.patient p " +
+            "LEFT JOIN FETCH a.doctor d " +
+            "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :patientName, '%')) " +
+            "AND a.appointmentTime BETWEEN :start AND :end")
+    List<Appointment> findByPatient_NameContainingIgnoreCaseAndAppointmentTimeBetween(
+            @Param("patientName") String patientName,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+    // 2. Find appointments by time range only (no doctor or patient filter)
+    @Query("SELECT a FROM Appointment a " +
+            "LEFT JOIN FETCH a.patient p " +
+            "LEFT JOIN FETCH a.doctor d " +
+            "WHERE a.appointmentTime BETWEEN :start AND :end")
+    List<Appointment> findByAppointmentTimeBetween(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
     @Modifying
     @Transactional
     @Query("DELETE FROM Appointment a WHERE a.doctor.id = :doctorId")
@@ -69,7 +91,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findByPatientIdAndDoctorName(Long patientId, String doctorName);
 
-   // 1. Extend JpaRepository:
+    List<Appointment> findByPatientIdAndDoctorNameAndStatus(Long patientId, String doctorName, int status);
+
+    // 1. Extend JpaRepository:
 //    - The repository extends JpaRepository<Appointment, Long>, which gives it basic CRUD functionality.
 //    - The methods such as save, delete, update, and find are inherited without the need for explicit implementation.
 //    - JpaRepository also includes pagination and sorting features.

@@ -31,14 +31,15 @@ public class PrescriptionController {
     public ResponseEntity<Map<String, String>> savePrescription(
             @Valid @RequestBody Prescription prescription,
             @PathVariable String token) {
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, "doctor");
+        if (!valid.getStatusCode().is2xxSuccessful()) {
 
-        if (!service.validateToken(token, "doctor")) {
             return ResponseEntity.status(403)
                     .body(Map.of("message", "Invalid or expired token"));
         }
 
         // Update appointment status before saving
-        appointmentService.updateAppointmentStatus(prescription.getAppointmentId(), "PRESCRIBED");
+        appointmentService.changeAppointmentStatus(prescription.getAppointmentId(), 1);
 
         return prescriptionService.savePrescription(prescription);
     }
@@ -48,7 +49,8 @@ public class PrescriptionController {
             @PathVariable Long appointmentId,
             @PathVariable String token) {
 
-        if (!service.validateToken(token, "doctor")) {
+        ResponseEntity<Map<String, String>> valid = service.validateToken(token, "doctor");
+        if (!valid.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(403)
                     .body(Map.of("message", "Invalid or expired token"));
         }

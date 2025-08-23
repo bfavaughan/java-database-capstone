@@ -1,17 +1,12 @@
 package com.project.back_end.repo;
 
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.services.*;
-import com.project.back_end.DTO.*;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import org.springframework.http.ResponseEntity;
+import com.project.back_end.models.Doctor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
@@ -27,7 +22,11 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
     List<Doctor> findBySpecialtyIgnoreCase(String specialty);
 
-   // 1. Extend JpaRepository:
+    boolean existsByEmail(String identifier);
+
+    List<Doctor> findByNameContainingIgnoreCase(String name);
+
+    // 1. Extend JpaRepository:
 //    - The repository extends JpaRepository<Doctor, Long>, which gives it basic CRUD functionality.
 //    - This allows the repository to perform operations like save, delete, update, and find without needing to implement these methods manually.
 //    - JpaRepository also includes features like pagination and sorting.

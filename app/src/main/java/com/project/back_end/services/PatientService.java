@@ -1,27 +1,16 @@
 package com.project.back_end.services;
 
-import com.project.back_end.models.*;
-import com.project.back_end.repo.*;
-import com.project.back_end.DTO.*;
-// --- Spring Core ---
-import org.springframework.stereotype.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.*;
-
-// --- Spring Web / REST ---
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.*;
-
-// --- Spring Transaction / JPA ---
-import org.springframework.transaction.annotation.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.*;
-
+import com.project.back_end.DTO.AppointmentDTO;
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Patient;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.PatientRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PatientService {
@@ -114,7 +103,10 @@ public class PatientService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
+    public Long getPatientIdByEmail(String email) {
+        Patient patient = patientRepository.findByEmail(email);
+        return patient.getId().resolveConstantDesc(null); // returns null if patient not found
+    }
    public ResponseEntity<Map<String, Object>> filterByDoctor(Long patientId, String doctorName) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -176,6 +168,16 @@ public class PatientService {
             response.put("error", "An error occurred while retrieving patient details.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    public ResponseEntity<Map<String, Object>> getPatientAppointments(Long patientId) {
+        List<Appointment> appointments = appointmentRepository.findByPatientId(patientId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("appointments", appointments);
+        response.put("count", appointments.size());
+
+        return ResponseEntity.ok(response);
     }
 // 1. **Add @Service Annotation**:
 //    - The `@Service` annotation is used to mark this class as a Spring service component. 
