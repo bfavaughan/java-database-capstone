@@ -59,7 +59,7 @@ public class PatientService {
             }
 
             // Retrieve appointments
-            List<Appointment> appointments = appointmentRepository.findByPatientId(id);
+            List<Appointment> appointments = appointmentRepository.findByPatient_Id(id);
             List<AppointmentDTO> appointmentDTOs = new ArrayList<>();
             for (Appointment a : appointments) {
                 appointmentDTOs.add(new AppointmentDTO(a));
@@ -110,7 +110,7 @@ public class PatientService {
    public ResponseEntity<Map<String, Object>> filterByDoctor(Long patientId, String doctorName) {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<Appointment> appointments = appointmentRepository.findByPatientIdAndDoctorName(patientId, doctorName);
+            List<Appointment> appointments = appointmentRepository.findByPatient_IdAndDoctor_Name(patientId, doctorName);
             List<AppointmentDTO> dtoList = new ArrayList<>();
             for (Appointment appointment : appointments) {
                 dtoList.add(new AppointmentDTO(appointment));
@@ -137,7 +137,7 @@ public class PatientService {
                 return ResponseEntity.badRequest().body(response);
             }
     
-            List<Appointment> appointments = appointmentRepository.findByPatientIdAndDoctorNameAndStatus(patientId, doctorName, status);
+            List<Appointment> appointments = appointmentRepository.findByPatient_IdAndDoctor_NameAndStatus(patientId, doctorName, status);
             List<AppointmentDTO> dtoList = new ArrayList<>();
             for (Appointment appointment : appointments) {
                 dtoList.add(new AppointmentDTO(appointment));
@@ -171,7 +171,7 @@ public class PatientService {
     }
 
     public ResponseEntity<Map<String, Object>> getPatientAppointments(Long patientId) {
-        List<Appointment> appointments = appointmentRepository.findByPatientId(patientId);
+        List<Appointment> appointments = appointmentRepository.findByPatient_Id(patientId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("appointments", appointments);
